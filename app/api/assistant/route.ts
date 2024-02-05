@@ -1,6 +1,7 @@
 import { experimental_AssistantResponse } from "ai";
 import OpenAI from "openai";
 import { MessageContentText } from "openai/resources/beta/threads/messages/messages";
+import { Run } from "openai/resources/beta/threads/runs/runs.mjs";
 
 // Create an OpenAI API client (that's edge friendly!)
 const openai = new OpenAI({
