@@ -3,22 +3,13 @@
 import { Message, experimental_useAssistant as useAssistant } from "ai/react";
 import { useEffect, useRef } from "react";
 
-const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-const roleToColorMap: Record<Message["role"], string> = isDarkMode ? {
-  system: "lightcoral",
-  user: "lightblue",
-  assistant: "lightgreen",
-  function: "white",
-  data: "white",
-  tool: "white"
-} : {
-  system: "darkred",
-  user: "darkblue",
-  assistant: "darkgreen",
-  function: "black",
-  data: "black",
-  tool: "black"
+const roleToColorMap: Record<Message["role"], string> = {
+  system: "#FF6347",  // Tomato
+  user: "#1E90FF",    // DodgerBlue
+  assistant: "#32CD32", // LimeGreen
+  function: "#696969", // DimGray
+  data: "#696969",    // DimGray
+  tool: "#696969"     // DimGray
 };
 
 export default function Chat() {
