@@ -12,3 +12,5 @@ export default async function Cart({ params }: { params: { user: string } }) {
     </div>
   );
 }
+
+// note this file makes pushing to vercel fail
