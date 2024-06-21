@@ -1,87 +1,113 @@
-"use client";
+'use client';
 
-import { Message, experimental_useAssistant as useAssistant } from "ai/react";
-import { useEffect, useRef } from "react";
-
-const roleToColorMap: Record<Message["role"], string> = {
-  system: "#FF6347",  // Tomato
-  user: "#1E90FF",    // DodgerBlue
-  assistant: "#32CD32", // LimeGreen
-  function: "#696969", // DimGray
-  data: "#696969",    // DimGray
-  tool: "#696969"     // DimGray
-};
+import React, { useEffect, useRef } from 'react';
+import { Message, useAssistant } from '@ai-sdk/react';
 
 export default function Chat() {
-  const { status, messages, input, submitMessage, handleInputChange, error } =
-    useAssistant({
-      api: "/api/assistant",
-    });
+  const { status, messages, input, submitMessage, handleInputChange } =
+    useAssistant({ api: '/api/assistant' });
 
-  // When status changes to accepting messages, focus the input:
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   useEffect(() => {
-    if (status === "awaiting_message") {
-      inputRef.current?.focus();
-    }
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    inputRef.current?.focus();
   }, [status]);
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    submitMessage();
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      submitMessage();
+    }
+  };
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#333', color: '#fff', margin: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#333', color: '#fff', margin: 0, padding: '1em' }}>
       <header style={{ fontSize: '2em', marginBottom: '1em' }}>My Chitty Chatty Bot 🤖</header>
-      <p style={{ marginBottom: '1em', textAlign: 'center' }}>This is a work in progress as I learn the wild world of coding.</p>
-      <p style={{ marginBottom: '1em', textAlign: 'center' }}>I do not see or store transcripts, but it does send text to OpenAI in order for the bot to work.</p>
-      <p style={{ marginBottom: '1em', textAlign: 'center' }}>Note: Responses may take a bit of time. I improved its functionality, but also slowed it down a lot. I am working, okay? Chill.</p>
-      <p style={{ marginBottom: '1em', textAlign: 'center' }}>For the purposes of testing and for fun, this is the embarrassing AI chatbot I used to have in my online dating profile.</p>
-      <div style={{ border: '1px solid #ccc', borderRadius: '1em', padding: '1em', width: '100%', maxWidth: '800px', backgroundColor: '#444' }}>
-        {error != null && (
-          <div style={{ fontSize: '2em', marginBottom: '1em', backgroundColor: 'red', color: 'white', padding: '1em', borderRadius: '1em' }}>
-            Error: {(error as any).toString()}
-          </div>
-        )}
-
-        {messages.map((m: Message) => (
-          <div
-            key={m.id}
-            style={{
-              marginBottom: '1em',
-              color: roleToColorMap[m.role],
-              textAlign: m.role === 'user' ? 'right' : 'left',
-            }}
-          >
-            <strong>{`${m.role}: `}</strong>
-            <br />
-            {m.role !== "data" && m.content}
-            {m.role === "data" && (
-              <>
-                {(m.data as any).description}
-                <br />
-                <pre style={{ backgroundColor: '#555', padding: '1em', borderRadius: '1em' }}>
-                  {JSON.stringify(m.data, null, 2)}
-                </pre>
-              </>
-            )}
-            <br />
-            <br />
-          </div>
-        ))}
-
-        {status === "in_progress" && (
-          <div style={{ height: '8px', width: '100%', padding: '1em', marginBottom: '1em', backgroundColor: '#555', borderRadius: '1em' }} />
-        )}
-
-        <form onSubmit={submitMessage} style={{ display: 'flex', padding: '1em', backgroundColor: '#555', borderRadius: '1em', boxShadow: '0 0 10px rgba(0,0,0,0.1)', width: '100%' }}>
+      <p style={{ marginBottom: '1em', textAlign: 'center' }}>This is an extremely simple, work-in-progress chatbot. Just a starting point, for now. Type your message and press send to interact with it.</p>
+      <p style={{ marginBottom: '1em', textAlign: 'center' }}>At the moment, this goofball is set up to act like me on a dating app.</p>
+      <p style={{ marginBottom: '1em', textAlign: 'center' }}>Your transcript will be stored and reviewed for quality assurance.</p>
+      <div style={{ 
+        padding: '1em', 
+        backgroundColor: '#444', 
+        borderRadius: '1em', 
+        boxShadow: '0 0 10px rgba(0,0,0,0.1)', 
+        width: '90%', 
+        maxWidth: '600px', 
+        height: '60vh', 
+        display: 'flex', 
+        flexDirection: 'column',
+        border: '2px solid #666' // Added border
+      }}>
+        <div style={{ flexGrow: 1, overflowY: 'auto', marginBottom: '1em', paddingRight: '0.5em' }}>
+          {messages.map((m: Message) => (
+            <div key={m.id} style={{ 
+              marginBottom: '0.5em', 
+              padding: '0.5em', 
+              borderRadius: '0.5em',
+              backgroundColor: m.role === 'assistant' ? 'rgba(173, 216, 230, 0.1)' : 'rgba(144, 238, 144, 0.1)',
+              alignSelf: m.role === 'assistant' ? 'flex-start' : 'flex-end',
+              maxWidth: '80%',
+              display: 'flex',
+              justifyContent: m.role === 'assistant' ? 'flex-start' : 'flex-end' // Align text
+            }}>
+              <p style={{ color: m.role === 'assistant' ? 'lightblue' : 'lightgreen', margin: 0 }}>
+                <strong>{m.role === 'assistant' ? 'Bot' : 'You'}:</strong> {m.role !== 'data' && m.content}
+                {m.role === 'data' && (
+                  <>
+                    {(m.data as any).description}
+                    <br />
+                    <pre className={'bg-gray-200'}>
+                      {JSON.stringify(m.data, null, 2)}
+                    </pre>
+                  </>
+                )}
+              </p>
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+        <form onSubmit={handleSubmit} style={{ display: 'flex' }}>
           <input
             ref={inputRef}
-            disabled={status !== "awaiting_message"}
+            disabled={status !== 'awaiting_message'}
             value={input}
             placeholder="Type your message here..."
             onChange={handleInputChange}
-            style={{ flexGrow: 1, marginRight: '0.5em', padding: '0.5em', border: '1px solid #ccc', borderRadius: '0.5em', backgroundColor: '#666', color: '#fff' }}
+            onKeyPress={handleKeyPress}
+            style={{ flexGrow: 1, marginRight: '0.5em', padding: '0.5em', border: '1px solid #ccc', borderRadius: '0.5em', backgroundColor: '#555', color: '#fff' }}
           />
-          <button type="submit" style={{ padding: '0.5em', backgroundColor: 'blue', color: 'white', borderRadius: '0.5em' }}>Send</button>
+          <button 
+            type="submit" 
+            disabled={status !== 'awaiting_message' || !input.trim()}
+            style={{ 
+              padding: '0.5em', 
+              backgroundColor: status !== 'awaiting_message' || !input.trim() ? '#666' : 'blue', 
+              color: 'white', 
+              borderRadius: '0.5em',
+              cursor: status !== 'awaiting_message' || !input.trim() ? 'not-allowed' : 'pointer'
+            }}
+          >
+            Send
+          </button>
         </form>
       </div>
+      {status !== 'awaiting_message' && (
+        <p style={{ marginTop: '1em', color: 'lightgray' }}>Bot is typing...</p>
+      )}
     </div>
   );
 }
