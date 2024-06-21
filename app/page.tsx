@@ -38,7 +38,7 @@ export default function Chat() {
     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#333', color: '#fff', margin: 0, padding: '1em' }}>
       <header style={{ fontSize: '2em', marginBottom: '1em' }}>My Chitty Chatty Bot 🤖</header>
       <p style={{ marginBottom: '1em', textAlign: 'center' }}>This is an extremely simple, work-in-progress chatbot. Just a starting point, for now. Type your message and press send to interact with it.</p>
-      <p style={{ marginBottom: '1em', textAlign: 'center' }}>At the moment, this goofball is set up to act like me on a dating app.</p>
+      <p style={{ marginBottom: '1em', textAlign: 'center' }}>This bot acts as my website's frontpage assistant. Imagine you're a small business owner, and tell it what kind of business you run.</p>
       <p style={{ marginBottom: '1em', textAlign: 'center' }}>Your transcript will be stored and reviewed for quality assurance.</p>
       <div style={{ 
         padding: '1em', 
@@ -65,7 +65,7 @@ export default function Chat() {
               justifyContent: m.role === 'assistant' ? 'flex-start' : 'flex-end' // Align text
             }}>
               <p style={{ color: m.role === 'assistant' ? 'lightblue' : 'lightgreen', margin: 0 }}>
-                <strong>{m.role === 'assistant' ? 'Bot' : 'You'}:</strong> {m.role !== 'data' && m.content}
+                <strong>{m.role === 'assistant' ? 'SmitBot 3000' : 'You'}:</strong> {m.role !== 'data' && m.content}
                 {m.role === 'data' && (
                   <>
                     {(m.data as any).description}
