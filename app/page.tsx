@@ -216,8 +216,9 @@ export default function Chat() {
             {messages.map((m: Message) => (
               <MessageBubble key={m.id} role={m.role as 'user' | 'assistant'}>
                 <RoleName>{m.role === 'assistant' ? 'SmitBot 3000' : 'You'}:</RoleName>
-                <ReactMarkdown rehypePlugins={[rehypeRaw]} components={renderers} children={m.role === 'assistant' ? `${m.content}` : `${m.content}`} />
-                <small>{new Date().toLocaleTimeString()}</small>
+                <ReactMarkdown rehypePlugins={[rehypeRaw]} components={renderers}>
+                  {m.role === 'assistant' ? `${m.content}` : `${m.content}`}
+                </ReactMarkdown>
               </MessageBubble>
             ))}
             <div ref={messagesEndRef} />
