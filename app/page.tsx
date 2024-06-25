@@ -79,15 +79,15 @@ const MessageList = styled.div`
   padding-right: 0.5em;
 `;
 
-const MessageBubble = styled.div<{ role: 'user' | 'assistant' }>`
+const MessageBubble = styled.div<{ $role: 'user' | 'assistant' }>`
   margin-bottom: 0.5em;
   padding: 0.5em;
   border-radius: 0.5em;
-  background-color: ${(props) => props.role === 'assistant' ? props.theme.assistantMessage : props.theme.userMessage};
-  align-self: ${(props) => (props.role === 'assistant' ? 'flex-start' : 'flex-end')};
+  background-color: ${(props) => props.$role === 'assistant' ? props.theme.assistantMessage : props.theme.userMessage};
+  align-self: ${(props) => (props.$role === 'assistant' ? 'flex-start' : 'flex-end')};
   max-width: 80%;
   word-wrap: break-word;
-  text-align: ${(props) => (props.role === 'assistant' ? 'left' : 'right')};
+  text-align: ${(props) => (props.$role === 'assistant' ? 'left' : 'right')};
 `;
 
 const RoleName = styled.div`
@@ -158,6 +158,14 @@ const ThemeToggle = styled.button`
   font-size: 1.5em;
 `;
 
+const components = {
+  a: ({ href, children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+    <a href={href} target="_blank" rel="noopener noreferrer" style={{ color: props.style?.color || 'blue' }} {...props}>
+      {children}
+    </a>
+  ),
+};
+
 export default function Chat() {
   const { status, messages, input, submitMessage, handleInputChange } = useAssistant({ api: '/api/assistant' });
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -192,14 +200,6 @@ export default function Chat() {
     setIsDarkMode(!isDarkMode);
   };
 
-  const renderers = {
-    a: ({ href, children }: { href: string; children: React.ReactNode }) => (
-      <a href={href} target="_blank" rel="noopener noreferrer" style={{ color: isDarkMode ? 'lightblue' : 'blue' }}>
-        {children}
-      </a>
-    ),
-  };
-
   return (
     <ThemeProvider theme={isDarkMode ? theme.dark : theme.light}>
       <GlobalStyle />
@@ -214,10 +214,10 @@ export default function Chat() {
         <ChatContainer>
           <MessageList>
             {messages.map((m: Message) => (
-              <MessageBubble key={m.id} role={m.role as 'user' | 'assistant'}>
+              <MessageBubble key={m.id} $role={m.role as 'user' | 'assistant'}>
                 <RoleName>{m.role === 'assistant' ? 'SmitBot 3000' : 'You'}:</RoleName>
-                <ReactMarkdown rehypePlugins={[rehypeRaw]} components={renderers}>
-                  {m.role === 'assistant' ? `${m.content}` : `${m.content}`}
+                <ReactMarkdown rehypePlugins={[rehypeRaw]} components={components}>
+                  {m.content}
                 </ReactMarkdown>
               </MessageBubble>
             ))}
