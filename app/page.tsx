@@ -76,18 +76,21 @@ const MessageList = styled.div`
   flex-grow: 1;
   overflow-y: auto;
   margin-bottom: 1em;
-  padding-right: 0.5em;
+  padding-right: 0.2em; /* Reduced padding further */
+  padding-left: 0.2em; /* Ensure left padding is small as well */
 `;
 
 const MessageBubble = styled.div<{ $role: 'user' | 'assistant' }>`
-  margin-bottom: 0.5em;
+  margin-bottom: 0.3em; /* Reduced margin */
   padding: 0.5em;
   border-radius: 0.5em;
   background-color: ${(props) => props.$role === 'assistant' ? props.theme.assistantMessage : props.theme.userMessage};
-  align-self: ${(props) => (props.$role === 'assistant' ? 'flex-start' : 'flex-end')};
-  max-width: 80%;
+  align-self: flex-start; /* Align both user and assistant messages to the start */
+  max-width: 98%;
   word-wrap: break-word;
-  text-align: ${(props) => (props.$role === 'assistant' ? 'left' : 'right')};
+  text-align: left; /* Keep alignment to left */
+  margin-left: 0; /* Ensure no left margin */
+  margin-right: 0; /* Ensure no right margin */
 `;
 
 const RoleName = styled.div`
