@@ -210,9 +210,8 @@ export default function Chat() {
         <ThemeToggle onClick={toggleTheme}>
           {isDarkMode ? '☀️' : '🌙'}
         </ThemeToggle>
-        <Header>My Chitty Chatty Bot 🤖</Header>
-        <p>This is an extremely simple, work-in-progress chatbot. Just a starting point, for now. Type your message and press send to interact with it.</p>
-        <p>This bot acts as my website frontpage assistant. Imagine you are a small business owner, and tell it what kind of business you run.</p>
+        <Header></Header>
+        <p>Thanks for visiting my website. Tell my assistant below what brought you here today.</p>
         <p>Your transcript will be stored and reviewed for quality assurance.</p>
         <ChatContainer>
           <MessageList>
