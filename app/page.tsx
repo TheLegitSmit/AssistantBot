@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
 
-/* Global styles with a smooth transition */
+/* Global styles with smooth transitions */
 const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
@@ -18,10 +18,10 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-/* Light theme settings to blend with a white website background */
+/* Light theme adjusted to blend with a white website background */
 const lightTheme = {
-  bodyBackground: 'linear-gradient(135deg, #FFFFFF, #F7F7F7)', // subtle gradient
-  chatCardBackground: '#FAF9F7', // off-white
+  bodyBackground: 'linear-gradient(135deg, #FFFFFF, #F7F7F7)',
+  chatCardBackground: '#FAF9F7',
   textColor: '#333333',
   userBubble: '#d0e8ff',         // soft pastel blue for user messages
   assistantBubble: '#f0f0f0',    // light grey for assistant messages
@@ -84,7 +84,6 @@ const MessageList = styled.div`
   background: ${(props) => props.theme.chatCardBackground};
 `;
 
-/* Notice component for transcript disclaimer */
 const Notice = styled.div`
   font-size: 0.875rem;
   color: ${(props) => props.theme.textColor};
@@ -98,14 +97,14 @@ const Bubble = styled.div<{ $role: 'user' | 'assistant' }>`
   align-self: ${(props) => (props.$role === 'user' ? 'flex-end' : 'flex-start')};
   background: ${(props) =>
     props.$role === 'user' ? props.theme.userBubble : props.theme.assistantBubble};
-  color: ${(props) => (props.$role === 'user' ? '#fff' : props.theme.textColor)};
+  /* Set user text color to black */
+  color: ${(props) => (props.$role === 'user' ? '#000' : props.theme.textColor)};
   padding: 0.75rem 1rem;
   border-radius: 1rem;
   position: relative;
   max-width: 80%;
   line-height: 1.4;
   font-size: 1rem;
-  /* Tail pointer */
   &:after {
     content: "";
     position: absolute;
@@ -189,7 +188,7 @@ const TypingIndicator = styled.div`
   }
 `;
 
-/* Markdown styling wrapper */
+/* Markdown styling wrapper with custom link rendering */
 const MarkdownWrapper = styled.div`
   p {
     margin: 0;
@@ -197,8 +196,22 @@ const MarkdownWrapper = styled.div`
   a {
     color: ${(props) => props.theme.sendButton};
     text-decoration: underline;
+    cursor: pointer;
   }
 `;
+
+// Custom link renderer that forces links to open in a new tab.
+const LinkRenderer = ({ href, children, ...props }: { href?: string; children: React.ReactNode }) => {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    e.preventDefault();
+    if (href) window.open(href, '_blank');
+  };
+  return (
+    <a href={href} onClick={handleClick} {...props}>
+      {children}
+    </a>
+  );
+};
 
 // Explicitly type the initial assistant message as Message.
 const initialAssistantMessage: Message = {
@@ -209,12 +222,10 @@ const initialAssistantMessage: Message = {
 };
 
 export default function Chat() {
-  // Always use the light theme.
   const { status, messages, input, submitMessage, handleInputChange } = useAssistant({ api: '/api/assistant' });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // If no messages exist, display the initial assistant greeting.
   const displayMessages = messages.length > 0 ? messages : [initialAssistantMessage];
 
   const scrollToBottom = () => {
@@ -246,15 +257,18 @@ export default function Chat() {
       <GlobalStyle />
       <PageContainer>
         <Header>
-          <Title>Virtual Assistant</Title>
-          <Tagline></Tagline>
+          <Title>Chat Assistant</Title>
+          <Tagline>Ask anything – our AI is here to help.</Tagline>
         </Header>
         <ChatCard>
           <MessageList>
             {displayMessages.map((msg) => (
               <Bubble key={msg.id} $role={msg.role as 'user' | 'assistant'}>
                 <MarkdownWrapper>
-                  <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                  <ReactMarkdown
+                    rehypePlugins={[rehypeRaw]}
+                    components={{ a: LinkRenderer }}
+                  >
                     {msg.content}
                   </ReactMarkdown>
                 </MarkdownWrapper>
