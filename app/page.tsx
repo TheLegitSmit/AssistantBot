@@ -84,6 +84,7 @@ const MessageList = styled.div`
   background: ${(props) => props.theme.chatCardBackground};
 `;
 
+/* Notice component for transcript disclaimer */
 const Notice = styled.div`
   font-size: 0.875rem;
   color: ${(props) => props.theme.textColor};
@@ -97,7 +98,7 @@ const Bubble = styled.div<{ $role: 'user' | 'assistant' }>`
   align-self: ${(props) => (props.$role === 'user' ? 'flex-end' : 'flex-start')};
   background: ${(props) =>
     props.$role === 'user' ? props.theme.userBubble : props.theme.assistantBubble};
-  /* Set user text color to black */
+  /* Set user bubble text color to black */
   color: ${(props) => (props.$role === 'user' ? '#000' : props.theme.textColor)};
   padding: 0.75rem 1rem;
   border-radius: 1rem;
@@ -188,7 +189,7 @@ const TypingIndicator = styled.div`
   }
 `;
 
-/* Markdown styling wrapper with custom link rendering */
+/* Markdown wrapper with custom link rendering */
 const MarkdownWrapper = styled.div`
   p {
     margin: 0;
@@ -201,8 +202,8 @@ const MarkdownWrapper = styled.div`
 `;
 
 // Custom link renderer that forces links to open in a new tab.
-const LinkRenderer = ({ href, children, ...props }: { href?: string; children: React.ReactNode }) => {
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+const LinkRenderer = ({ href, children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     if (href) window.open(href, '_blank');
   };
@@ -257,8 +258,8 @@ export default function Chat() {
       <GlobalStyle />
       <PageContainer>
         <Header>
-          <Title>Chat Assistant</Title>
-          <Tagline>Ask anything – our AI is here to help.</Tagline>
+          <Title>Virtual Assistant</Title>
+          <Tagline></Tagline>
         </Header>
         <ChatCard>
           <MessageList>
