@@ -213,8 +213,8 @@ const MarkdownWrapper = styled.div`
   }
 `;
 
-// Define the default assistant greeting message.
-const initialAssistantMessage = {
+// Explicitly type the initial assistant message as Message.
+const initialAssistantMessage: Message = {
   id: 'init-1',
   role: 'assistant',
   content:
@@ -228,7 +228,7 @@ export default function Chat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // If no messages are present, display the initial assistant greeting.
+  // If no messages exist, use the initial assistant message.
   const displayMessages = messages.length > 0 ? messages : [initialAssistantMessage];
 
   const scrollToBottom = () => {
@@ -272,7 +272,7 @@ export default function Chat() {
         </Header>
         <ChatCard>
           <MessageList>
-            {displayMessages.map((msg: Message) => (
+            {displayMessages.map((msg) => (
               <Bubble key={msg.id} $role={msg.role as 'user' | 'assistant'}>
                 <MarkdownWrapper>
                   <ReactMarkdown rehypePlugins={[rehypeRaw]}>
