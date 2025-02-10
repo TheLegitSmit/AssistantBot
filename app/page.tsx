@@ -6,172 +6,217 @@ import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
 
+/* Global styles to reset defaults and apply the chosen theme */
 const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: ${(props) => props.theme.bodyBackground};
+    color: ${(props) => props.theme.textColor};
+    transition: background 0.3s ease, color 0.3s ease;
   }
 `;
 
-const theme = {
-  light: {
-    background: '#f0f0f0',
-    chatBackground: '#ffffff',
-    text: '#333333',
-    userMessage: 'rgba(144, 238, 144, 0.3)',
-    assistantMessage: 'rgba(173, 216, 230, 0.3)',
-    input: '#ffffff',
-    inputText: '#333333',
-    button: '#0066cc',
-    buttonDisabled: '#cccccc',
-  },
-  dark: {
-    background: '#333333',
-    chatBackground: '#444444',
-    text: '#ffffff',
-    userMessage: 'rgba(144, 238, 144, 0.1)',
-    assistantMessage: 'rgba(173, 216, 230, 0.1)',
-    input: '#555555',
-    inputText: '#ffffff',
-    button: '#0099ff',
-    buttonDisabled: '#666666',
-  },
+/* Define two themes with modern palettes */
+const lightTheme = {
+  bodyBackground: 'linear-gradient(135deg, #f0f9ff, #cbebff)',
+  chatCardBackground: '#ffffff',
+  textColor: '#333333',
+  userBubble: '#d2e9ff',
+  assistantBubble: '#e8e8e8',
+  inputBackground: '#ffffff',
+  inputBorder: '#cccccc',
+  sendButton: '#007aff',
+  sendButtonHover: '#005bb5',
 };
 
-const Container = styled.div`
+const darkTheme = {
+  bodyBackground: 'linear-gradient(135deg, #1a1a1a, #2c2c2c)',
+  chatCardBackground: '#333333',
+  textColor: '#f0f0f0',
+  userBubble: '#005bb5',
+  assistantBubble: '#4a4a4a',
+  inputBackground: '#444444',
+  inputBorder: '#555555',
+  sendButton: '#0a84ff',
+  sendButtonHover: '#0066cc',
+};
+
+/* Styled Components for layout and elements */
+const PageContainer = styled.div`
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background-color: ${(props) => props.theme.background};
-  color: ${(props) => props.theme.text};
-  padding: 1em;
+  padding: 1rem;
+  position: relative;
 `;
 
 const Header = styled.header`
-  font-size: 2em;
-  margin-bottom: 1em;
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
 `;
 
-const ChatContainer = styled.div`
-  padding: 1em;
-  background-color: ${(props) => props.theme.chatBackground};
-  border-radius: 1em;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  width: 90%;
-  max-width: 600px;
-  height: 60vh;
+const Title = styled.h1`
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: bold;
+`;
+
+const Tagline = styled.p`
+  margin: 0.5rem 0 0;
+  font-size: 1rem;
+  color: ${(props) => props.theme.textColor};
+`;
+
+const ChatCard = styled.div`
+  background: ${(props) => props.theme.chatCardBackground};
+  width: 100%;
+  max-width: 800px;
+  height: 70vh;
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
-  border: 2px solid ${(props) => props.theme.text};
-  @media (max-width: 600px) {
-    width: 95%;
-    height: 70vh;
-  }
+  overflow: hidden;
+  border: 1px solid ${(props) => props.theme.inputBorder};
 `;
 
 const MessageList = styled.div`
-  flex-grow: 1;
+  flex: 1;
+  padding: 1rem;
   overflow-y: auto;
-  margin-bottom: 1em;
-  padding-right: 0.2em; /* Reduced padding further */
-  padding-left: 0.2em; /* Ensure left padding is small as well */
-`;
-
-const MessageBubble = styled.div<{ $role: 'user' | 'assistant' }>`
-  margin-bottom: 0.3em; /* Reduced margin */
-  padding: 0.5em;
-  border-radius: 0.5em;
-  background-color: ${(props) => props.$role === 'assistant' ? props.theme.assistantMessage : props.theme.userMessage};
-  align-self: flex-start; /* Align both user and assistant messages to the start */
-  max-width: 98%;
-  word-wrap: break-word;
-  text-align: left; /* Keep alignment to left */
-  margin-left: 0; /* Ensure no left margin */
-  margin-right: 0; /* Ensure no right margin */
-`;
-
-const RoleName = styled.div`
-  font-weight: bold;
-  margin-bottom: 0.5em;
-`;
-
-const InputForm = styled.form`
   display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: ${(props) => props.theme.chatCardBackground};
 `;
 
-const Input = styled.input`
-  flex-grow: 1;
-  margin-right: 0.5em;
-  padding: 0.5em;
-  border: 1px solid ${(props) => props.theme.text};
-  border-radius: 0.5em;
-  background-color: ${(props) => props.theme.input};
-  color: ${(props) => props.theme.inputText};
+const Bubble = styled.div<{ $role: 'user' | 'assistant' }>`
+  align-self: ${(props) => (props.$role === 'user' ? 'flex-end' : 'flex-start')};
+  background: ${(props) =>
+    props.$role === 'user' ? props.theme.userBubble : props.theme.assistantBubble};
+  color: ${(props) => (props.$role === 'user' ? '#fff' : props.theme.textColor)};
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  position: relative;
+  max-width: 80%;
+  line-height: 1.4;
+  font-size: 1rem;
+  /* Create a small tail pointer */
+  &:after {
+    content: "";
+    position: absolute;
+    top: 0.75rem;
+    ${(props) =>
+      props.$role === 'user'
+        ? `right: -0.5rem; border-left: 0.5rem solid ${props.theme.userBubble};`
+        : `left: -0.5rem; border-right: 0.5rem solid ${props.theme.assistantBubble};`}
+    border-top: 0.5rem solid transparent;
+    border-bottom: 0.5rem solid transparent;
+  }
 `;
 
-const Button = styled.button<{ disabled: boolean }>`
-  padding: 0.5em;
-  background-color: ${(props) => props.disabled ? props.theme.buttonDisabled : props.theme.button};
-  color: white;
+const InputContainer = styled.form`
+  display: flex;
+  border-top: 1px solid ${(props) => props.theme.inputBorder};
+  padding: 0.75rem;
+  background: ${(props) => props.theme.chatCardBackground};
+`;
+
+const InputBox = styled.input`
+  flex: 1;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid ${(props) => props.theme.inputBorder};
+  border-radius: 999px;
+  background: ${(props) => props.theme.inputBackground};
+  color: ${(props) => props.theme.textColor};
+  outline: none;
+  transition: border 0.2s ease;
+  &:focus {
+    border-color: ${(props) => props.theme.sendButton};
+  }
+`;
+
+const SendButton = styled.button`
+  margin-left: 0.75rem;
+  padding: 0 1rem;
+  background: ${(props) => props.theme.sendButton};
+  color: #fff;
+  font-size: 1rem;
   border: none;
-  border-radius: 0.5em;
-  cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  &:hover {
+    background: ${(props) => props.theme.sendButtonHover};
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 `;
 
 const TypingIndicator = styled.div`
   display: flex;
+  align-items: center;
   justify-content: center;
-  margin-top: 1em;
+  padding: 0.5rem;
+  gap: 0.3rem;
   span {
-    width: 10px;
-    height: 10px;
-    margin: 0 5px;
-    background-color: ${(props) => props.theme.text};
+    width: 8px;
+    height: 8px;
+    background: ${(props) => props.theme.textColor};
     border-radius: 50%;
-    display: inline-block;
-    animation: bounce 1.4s infinite ease-in-out both;
-    &:nth-child(1) {
-      animation-delay: -0.32s;
-    }
-    &:nth-child(2) {
-      animation-delay: -0.16s;
-    }
+    animation: blink 1.4s infinite both;
   }
-  @keyframes bounce {
+  span:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  span:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+  @keyframes blink {
     0%, 80%, 100% {
-      transform: scale(0);
+      opacity: 0;
     }
     40% {
-      transform: scale(1.0);
+      opacity: 1;
     }
   }
 `;
 
 const ThemeToggle = styled.button`
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
   border: none;
-  color: ${(props) => props.theme.text};
+  font-size: 1.5rem;
   cursor: pointer;
-  font-size: 1.5em;
+  color: ${(props) => props.theme.textColor};
 `;
 
-const components = {
-  a: ({ href, children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
-    <a href={href} target="_blank" rel="noopener noreferrer" style={{ color: props.style?.color || 'blue' }} {...props}>
-      {children}
-    </a>
-  ),
-};
+/* A small wrapper for markdown styling */
+const MarkdownWrapper = styled.div`
+  p {
+    margin: 0;
+  }
+  a {
+    color: ${(props) => props.theme.sendButton};
+    text-decoration: underline;
+  }
+`;
 
 export default function Chat() {
+  // Set dark mode as default by initializing isDarkMode to true.
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const { status, messages, input, submitMessage, handleInputChange } = useAssistant({ api: '/api/assistant' });
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -187,7 +232,7 @@ export default function Chat() {
     inputRef.current?.focus();
   }, [status]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     submitMessage();
   };
@@ -200,54 +245,60 @@ export default function Chat() {
   };
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
+    setIsDarkMode((prev) => !prev);
   };
 
   return (
-    <ThemeProvider theme={isDarkMode ? theme.dark : theme.light}>
+    <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
       <GlobalStyle />
-      <Container>
+      <PageContainer>
         <ThemeToggle onClick={toggleTheme}>
           {isDarkMode ? '☀️' : '🌙'}
         </ThemeToggle>
-        <Header></Header>
-        <p>Thanks for visiting my website. Tell my assistant below what brought you here today.</p>
-        <p>Your transcript will be stored and reviewed for quality assurance.</p>
-        <ChatContainer>
+        <Header>
+          <Title>Chat Assistant</Title>
+          <Tagline>Ask anything – our AI is here to help.</Tagline>
+        </Header>
+        <ChatCard>
           <MessageList>
-            {messages.map((m: Message) => (
-              <MessageBubble key={m.id} $role={m.role as 'user' | 'assistant'}>
-                <RoleName>{m.role === 'assistant' ? 'SmitBot 3000' : 'You'}:</RoleName>
-                <ReactMarkdown rehypePlugins={[rehypeRaw]} components={components}>
-                  {m.content}
-                </ReactMarkdown>
-              </MessageBubble>
+            {messages.map((msg: Message) => (
+              <Bubble key={msg.id} $role={msg.role as 'user' | 'assistant'}>
+                <MarkdownWrapper>
+                  <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                    {msg.content}
+                  </ReactMarkdown>
+                </MarkdownWrapper>
+              </Bubble>
             ))}
             <div ref={messagesEndRef} />
           </MessageList>
-          <InputForm onSubmit={handleSubmit}>
-            <Input
+          <InputContainer onSubmit={onSubmit}>
+            <InputBox
               ref={inputRef}
               disabled={status !== 'awaiting_message'}
               value={input}
-              placeholder="Type your message here..."
               onChange={handleInputChange}
               onKeyPress={handleKeyPress}
-              aria-label="Chat message"
+              placeholder="Type your message here..."
+              aria-label="Chat input"
             />
-            <Button type="submit" disabled={status !== 'awaiting_message' || !input.trim()} aria-label="Send message">
+            <SendButton
+              type="submit"
+              disabled={status !== 'awaiting_message' || !input.trim()}
+              aria-label="Send message"
+            >
               Send
-            </Button>
-          </InputForm>
-        </ChatContainer>
+            </SendButton>
+          </InputContainer>
+        </ChatCard>
         {status !== 'awaiting_message' && (
-          <TypingIndicator>
-            <span></span>
-            <span></span>
-            <span></span>
+          <TypingIndicator aria-label="Assistant is typing">
+            <span />
+            <span />
+            <span />
           </TypingIndicator>
         )}
-      </Container>
+      </PageContainer>
     </ThemeProvider>
   );
 }
