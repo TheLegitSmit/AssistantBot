@@ -246,8 +246,8 @@ export default function Chat() {
       <GlobalStyle />
       <PageContainer>
         <Header>
-          <Title>Chat Assistant</Title>
-          <Tagline>Ask anything – our AI is here to help.</Tagline>
+          <Title>Virtual Assistant</Title>
+          <Tagline></Tagline>
         </Header>
         <ChatCard>
           <MessageList>
