@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
 
-/* Global styles to reset defaults and apply the chosen theme */
+/* Global styles with a smooth transition */
 const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
@@ -18,19 +18,20 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-/* Define two themes with modern palettes */
+/* Updated light theme for a white website background */
 const lightTheme = {
-  bodyBackground: 'linear-gradient(135deg, #f0f9ff, #cbebff)',
-  chatCardBackground: '#ffffff',
+  bodyBackground: 'linear-gradient(135deg, #FFFFFF, #F7F7F7)', // subtle gradient from white to off-white
+  chatCardBackground: '#FAF9F7', // off-white chat card
   textColor: '#333333',
-  userBubble: '#d2e9ff',
-  assistantBubble: '#e8e8e8',
+  userBubble: '#d0e8ff',         // soft pastel blue for user messages
+  assistantBubble: '#f0f0f0',    // light grey for assistant messages
   inputBackground: '#ffffff',
-  inputBorder: '#cccccc',
+  inputBorder: '#dddddd',
   sendButton: '#007aff',
   sendButtonHover: '#005bb5',
 };
 
+/* Dark theme remains as before */
 const darkTheme = {
   bodyBackground: 'linear-gradient(135deg, #1a1a1a, #2c2c2c)',
   chatCardBackground: '#333333',
@@ -43,7 +44,7 @@ const darkTheme = {
   sendButtonHover: '#0066cc',
 };
 
-/* Styled Components for layout and elements */
+/* Styled Components */
 const PageContainer = styled.div`
   min-height: 100vh;
   display: flex;
@@ -96,6 +97,16 @@ const MessageList = styled.div`
   background: ${(props) => props.theme.chatCardBackground};
 `;
 
+/* Notice styled component for transcript disclaimer */
+const Notice = styled.div`
+  font-size: 0.875rem;
+  color: ${(props) => props.theme.textColor};
+  text-align: center;
+  padding: 0.5rem;
+  border-top: 1px solid ${(props) => props.theme.inputBorder};
+  background: ${(props) => props.theme.chatCardBackground};
+`;
+
 const Bubble = styled.div<{ $role: 'user' | 'assistant' }>`
   align-self: ${(props) => (props.$role === 'user' ? 'flex-end' : 'flex-start')};
   background: ${(props) =>
@@ -107,7 +118,6 @@ const Bubble = styled.div<{ $role: 'user' | 'assistant' }>`
   max-width: 80%;
   line-height: 1.4;
   font-size: 1rem;
-  /* Create a small tail pointer */
   &:after {
     content: "";
     position: absolute;
@@ -202,7 +212,7 @@ const ThemeToggle = styled.button`
   color: ${(props) => props.theme.textColor};
 `;
 
-/* A small wrapper for markdown styling */
+/* Markdown styling wrapper */
 const MarkdownWrapper = styled.div`
   p {
     margin: 0;
@@ -222,13 +232,13 @@ const initialAssistantMessage: Message = {
 };
 
 export default function Chat() {
-  // Dark mode is default.
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  // Set default mode to light.
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const { status, messages, input, submitMessage, handleInputChange } = useAssistant({ api: '/api/assistant' });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // If no messages exist, use the initial assistant message.
+  // Show the initial assistant message if there are no messages.
   const displayMessages = messages.length > 0 ? messages : [initialAssistantMessage];
 
   const scrollToBottom = () => {
@@ -267,8 +277,8 @@ export default function Chat() {
           {isDarkMode ? '☀️' : '🌙'}
         </ThemeToggle>
         <Header>
-          <Title>Chat Assistant</Title>
-          <Tagline>Ask anything – our AI is here to help.</Tagline>
+          <Title>Virtual Assistant</Title>
+          <Tagline></Tagline>
         </Header>
         <ChatCard>
           <MessageList>
@@ -283,6 +293,9 @@ export default function Chat() {
             ))}
             <div ref={messagesEndRef} />
           </MessageList>
+          <Notice>
+            Your transcript will be stored and reviewed for quality assurance.
+          </Notice>
           <InputContainer onSubmit={onSubmit}>
             <InputBox
               ref={inputRef}
