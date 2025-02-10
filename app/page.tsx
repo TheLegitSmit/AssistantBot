@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Message, useAssistant } from '@ai-sdk/react';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
@@ -18,10 +18,10 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-/* Updated light theme for a white website background */
+/* Light theme settings to blend with a white website background */
 const lightTheme = {
-  bodyBackground: 'linear-gradient(135deg, #FFFFFF, #F7F7F7)', // subtle gradient from white to off-white
-  chatCardBackground: '#FAF9F7', // off-white chat card
+  bodyBackground: 'linear-gradient(135deg, #FFFFFF, #F7F7F7)', // subtle gradient
+  chatCardBackground: '#FAF9F7', // off-white
   textColor: '#333333',
   userBubble: '#d0e8ff',         // soft pastel blue for user messages
   assistantBubble: '#f0f0f0',    // light grey for assistant messages
@@ -31,20 +31,7 @@ const lightTheme = {
   sendButtonHover: '#005bb5',
 };
 
-/* Dark theme remains as before */
-const darkTheme = {
-  bodyBackground: 'linear-gradient(135deg, #1a1a1a, #2c2c2c)',
-  chatCardBackground: '#333333',
-  textColor: '#f0f0f0',
-  userBubble: '#005bb5',
-  assistantBubble: '#4a4a4a',
-  inputBackground: '#444444',
-  inputBorder: '#555555',
-  sendButton: '#0a84ff',
-  sendButtonHover: '#0066cc',
-};
-
-/* Styled Components */
+/* Styled Components for layout and elements */
 const PageContainer = styled.div`
   min-height: 100vh;
   display: flex;
@@ -97,7 +84,7 @@ const MessageList = styled.div`
   background: ${(props) => props.theme.chatCardBackground};
 `;
 
-/* Notice styled component for transcript disclaimer */
+/* Notice component for transcript disclaimer */
 const Notice = styled.div`
   font-size: 0.875rem;
   color: ${(props) => props.theme.textColor};
@@ -118,6 +105,7 @@ const Bubble = styled.div<{ $role: 'user' | 'assistant' }>`
   max-width: 80%;
   line-height: 1.4;
   font-size: 1rem;
+  /* Tail pointer */
   &:after {
     content: "";
     position: absolute;
@@ -201,17 +189,6 @@ const TypingIndicator = styled.div`
   }
 `;
 
-const ThemeToggle = styled.button`
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: transparent;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: ${(props) => props.theme.textColor};
-`;
-
 /* Markdown styling wrapper */
 const MarkdownWrapper = styled.div`
   p {
@@ -232,13 +209,12 @@ const initialAssistantMessage: Message = {
 };
 
 export default function Chat() {
-  // Set default mode to light.
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Always use the light theme.
   const { status, messages, input, submitMessage, handleInputChange } = useAssistant({ api: '/api/assistant' });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Show the initial assistant message if there are no messages.
+  // If no messages exist, display the initial assistant greeting.
   const displayMessages = messages.length > 0 ? messages : [initialAssistantMessage];
 
   const scrollToBottom = () => {
@@ -265,20 +241,13 @@ export default function Chat() {
     }
   };
 
-  const toggleTheme = () => {
-    setIsDarkMode((prev) => !prev);
-  };
-
   return (
-    <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
+    <ThemeProvider theme={lightTheme}>
       <GlobalStyle />
       <PageContainer>
-        <ThemeToggle onClick={toggleTheme}>
-          {isDarkMode ? '☀️' : '🌙'}
-        </ThemeToggle>
         <Header>
-          <Title>Virtual Assistant</Title>
-          <Tagline></Tagline>
+          <Title>Chat Assistant</Title>
+          <Tagline>Ask anything – our AI is here to help.</Tagline>
         </Header>
         <ChatCard>
           <MessageList>
