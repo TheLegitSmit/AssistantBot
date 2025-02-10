@@ -213,12 +213,23 @@ const MarkdownWrapper = styled.div`
   }
 `;
 
+// Define the default assistant greeting message.
+const initialAssistantMessage = {
+  id: 'init-1',
+  role: 'assistant',
+  content:
+    "Hello, I'm Michael's virtual assistant. What brought you to our website today? Feel free to chat with me in natural language, just like you would with a person.",
+};
+
 export default function Chat() {
-  // Set dark mode as default by initializing isDarkMode to true.
+  // Dark mode is default.
   const [isDarkMode, setIsDarkMode] = useState(true);
   const { status, messages, input, submitMessage, handleInputChange } = useAssistant({ api: '/api/assistant' });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // If no messages are present, display the initial assistant greeting.
+  const displayMessages = messages.length > 0 ? messages : [initialAssistantMessage];
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -261,7 +272,7 @@ export default function Chat() {
         </Header>
         <ChatCard>
           <MessageList>
-            {messages.map((msg: Message) => (
+            {displayMessages.map((msg: Message) => (
               <Bubble key={msg.id} $role={msg.role as 'user' | 'assistant'}>
                 <MarkdownWrapper>
                   <ReactMarkdown rehypePlugins={[rehypeRaw]}>
