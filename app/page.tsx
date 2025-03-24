@@ -33,7 +33,7 @@ const lightTheme = {
 
 /* Styled Components for layout and elements */
 const PageContainer = styled.div`
-  min-height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -226,6 +226,7 @@ export default function Chat() {
   const { status, messages, input, submitMessage, handleInputChange } = useAssistant({ api: '/api/assistant' });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isFirstRender = useRef(true);
 
   const displayMessages = messages.length > 0 ? messages : [initialAssistantMessage];
 
@@ -239,6 +240,10 @@ export default function Chat() {
   };
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     scrollToBottom();
   }, [messages]);
 
