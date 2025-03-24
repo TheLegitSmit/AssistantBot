@@ -23,8 +23,8 @@ const lightTheme = {
   bodyBackground: 'linear-gradient(135deg, #FFFFFF, #F7F7F7)',
   chatCardBackground: '#FAF9F7',
   textColor: '#333333',
-  userBubble: '#d0e8ff',         // soft pastel blue for user messages
-  assistantBubble: '#f0f0f0',    // light grey for assistant messages
+  userBubble: '#d0e8ff',
+  assistantBubble: '#f0f0f0',
   inputBackground: '#ffffff',
   inputBorder: '#dddddd',
   sendButton: '#007aff',
@@ -33,7 +33,7 @@ const lightTheme = {
 
 /* Styled Components for layout and elements */
 const PageContainer = styled.div`
-  height: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -84,7 +84,6 @@ const MessageList = styled.div`
   background: ${(props) => props.theme.chatCardBackground};
 `;
 
-/* Notice component for transcript disclaimer */
 const Notice = styled.div`
   font-size: 0.875rem;
   color: ${(props) => props.theme.textColor};
@@ -98,7 +97,6 @@ const Bubble = styled.div<{ $role: 'user' | 'assistant' }>`
   align-self: ${(props) => (props.$role === 'user' ? 'flex-end' : 'flex-start')};
   background: ${(props) =>
     props.$role === 'user' ? props.theme.userBubble : props.theme.assistantBubble};
-  /* Set user bubble text color to black */
   color: ${(props) => (props.$role === 'user' ? '#000' : props.theme.textColor)};
   padding: 0.75rem 1rem;
   border-radius: 1rem;
@@ -189,7 +187,6 @@ const TypingIndicator = styled.div`
   }
 `;
 
-/* Markdown wrapper with custom link rendering */
 const MarkdownWrapper = styled.div`
   p {
     margin: 0;
@@ -226,29 +223,26 @@ export default function Chat() {
   const { status, messages, input, submitMessage, handleInputChange } = useAssistant({ api: '/api/assistant' });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const isFirstRender = useRef(true);
 
   const displayMessages = messages.length > 0 ? messages : [initialAssistantMessage];
 
-  const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      const messageList = messagesEndRef.current.parentElement;
-      if (messageList) {
-        messageList.scrollTop = messageList.scrollHeight;
-      }
-    }
-  };
-
+  // Use separate refs to skip auto-scroll and auto-focus on the first render.
+  const didMountScroll = useRef(false);
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
+    if (didMountScroll.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      didMountScroll.current = true;
     }
-    scrollToBottom();
   }, [messages]);
 
+  const didMountFocus = useRef(false);
   useEffect(() => {
-    inputRef.current?.focus();
+    if (didMountFocus.current && status === 'awaiting_message') {
+      inputRef.current?.focus();
+    } else {
+      didMountFocus.current = true;
+    }
   }, [status]);
 
   const onSubmit = (e: React.FormEvent) => {
