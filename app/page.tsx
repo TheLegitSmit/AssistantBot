@@ -230,7 +230,12 @@ export default function Chat() {
   const displayMessages = messages.length > 0 ? messages : [initialAssistantMessage];
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      const messageList = messagesEndRef.current.parentElement;
+      if (messageList) {
+        messageList.scrollTop = messageList.scrollHeight;
+      }
+    }
   };
 
   useEffect(() => {
