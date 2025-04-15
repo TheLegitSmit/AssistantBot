@@ -216,7 +216,7 @@ const initialAssistantMessage: Message = {
   id: 'init-1',
   role: 'assistant',
   content:
-    "Hello, I'm Michael's virtual assistant. What brought you to our website today? Feel free to chat with me in natural language, just like you would with a person.",
+    "Welcome aboard! SmitBot 3000 here, the virtual assistant of Michael Smit. You need not fret about formalities—just talk naturally, and I can guide you along. Mind sharing what led you to this here site today?",
 };
 
 export default function Chat() {
